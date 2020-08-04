@@ -12,11 +12,11 @@
     <div class="card pl-4 pt-5 pb-5 pr-4 mt-5">
         <div class="d-flex justify-content-end mt-3 pr-4" style="display: flex !important;align-items: center;justify-content: space-between !important">
           <h4>Execute with test data</h4>
-          <button
-            v-if="!isLoading"
+          <router-link to="/maps" v-if="!isLoading"
             type="submit"
             class="btn btn-primary btn-lg"
-          >{{ isSaving ? 'Saving...' : 'Upload'}}</button>
+          >{{ isSaving ? 'Saving...' : 'Upload'}}</router-link>
+        
           <rotate-square2 v-if="isLoading"></rotate-square2>
         </div>
     </div>
@@ -65,7 +65,7 @@ export default {
     async submitUserDetails() {
       this.isLoading = true;
       try {
-        let res = await axios.post("http://localhost:2000/api/scholar-find", {
+        let res = await axios.post("http://visualminer.com/api/scholar-find", {
           ...this.model,
         });
         this.isLoading = false;

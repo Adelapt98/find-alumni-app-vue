@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import ChooseCorrectAlumni from '../pages/ChooseCorrectAlumni'
+import ChooseCorrectAlumni2 from '../pages/ChooseCorrectAlumni2'
 import FindAlumni from '../pages/FindAlumni'
 import FindAlumniByIntAndCountry from '../pages/FindAlumniByIntAndCountry'
 import UploadAlumniFile from '../pages/UploadAlumniFile'
@@ -10,6 +11,7 @@ import Maps from '../pages/Maps'
 Vue.use(Router)
 
 export default new Router({
+  mode:'history',
   routes: [
     {
       path: '/',
@@ -40,6 +42,12 @@ export default new Router({
       path: '/choose-correct/:list',
       name: 'ChooseCorrectAlumni',
       component: ChooseCorrectAlumni,
+      props: true
+    },
+    {
+      path: '/choose-correct2/:list',
+      name: 'ChooseCorrectAlumni2',
+      component: ChooseCorrectAlumni2,
       props: true
     }
   ]

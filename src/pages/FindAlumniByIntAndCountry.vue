@@ -3,9 +3,10 @@
     <!-- <div class="d-flex justify-content-start     mb-3">
             <router-link to="/" class="btn btn-sm btn-outline-secondary">back</router-link>
     </div>-->
+    <h1>{{window.location.href}}</h1>
     <div class="d-flex justify-content-between align-items-center">
       <div class="d-flex flex-column align-items-start">
-        <h2>Find Alumni</h2>
+        <h2>Find Alumni By Interests And Country</h2>
         <span class="text-muted">Please enter the details</span>
       </div>
     </div>
@@ -40,14 +41,8 @@ export default {
   data() {
     return {
       model: {
-        name: "",
-        lastName: "",
-        field: "",
-        grade: "",
-        graduationYear: "",
-        birthCity: "",
-        email: "",
-        birthDate: "",
+        countryName: "",
+        interests: ""
       },
       schema: intCountFormSchema,
       formOptions: {
@@ -60,14 +55,14 @@ export default {
   methods: {
     navigate(data) {
       this.$router.push({
-        name: "ChooseCorrectAlumni",
+        name: "ChooseCorrectAlumni2",
         params: { list: data },
       });
     },
     async submitUserDetails() {
       this.isLoading = true;
       try {
-        let res = await axios.post("http://localhost:2000/api/scholar-find", {
+        let res = await axios.post("http://visualminer.com/api/scholar-find-interest-country", {
           ...this.model,
         });
         this.isLoading = false;

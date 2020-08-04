@@ -87,7 +87,7 @@ export default {
     async chooseCorrectPerson(id) {
       try {
         let res = await axios.get(
-          `http://localhost:2000/api/choose-correct-person/${id}`
+          `http://visualminer.com/api/choose-correct-person/${id}`
         );
         Vue.$toast.success(res.data.message.en);
 

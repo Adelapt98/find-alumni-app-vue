@@ -4,9 +4,19 @@
       <span v-if="loading">Loading...</span>
       <br />
     </div>
+      <button @click="downloadCSV()">
+        Download uploaded file
+      </button>
+    <h3>map1</h3>
     <l-map :zoom="zoom" :center="center" style="height: 500px; width: 100%">
       <l-tile-layer :url="url" :attribution="attribution" />
       <l-geo-json v-if="show" :geojson="geojson" :options="options" />
+    </l-map>
+    <h3 style="visibility: hidden;">map2</h3>
+    <h3>map2</h3>
+    <l-map :zoom="zoom" :center="center" style="height: 500px; width: 100%">
+      <l-tile-layer :url="url" :attribution="attribution" />
+      <l-geo-json v-if="show" :geojson="geojson" :options="options2" />
     </l-map>
   </div>
 </template>
@@ -14,6 +24,8 @@
 <script>
 import { latLng } from "leaflet";
 import { LMap, LTileLayer, LGeoJson } from "vue2-leaflet";
+import axios from "axios";
+import Vue from "vue";
 
 export default {
   name: "Example",
@@ -5416,33 +5428,62 @@ export default {
           },
         ],
       },
-
       options: {
         style: function (feature) {
-          // if (feature.properties.in_port) {
-          //   return {
-          //     weight: 4,
-          //     color: '#00FF00'
-          //   }
-          // } else {
-          //   return {
-          //     weight: 4,
-          //     color: '#FF0000'
-          //   }
-          // }
-            let m = feature.properties.male_student_count
-            let f = feature.properties.female_student_count
+          let m = feature.properties.male_student_count;
+          let f = feature.properties.female_student_count;
 
           let d = m > f ? m / (m + f) : f / (m + f);
-          let fillColor = m > f ? `rgba(161, 23, 154, ${d})` : `rgba(214, 184, 31, ${d})`; // important! need touch fillColor in computed for re-calculate when change fillColor
-            return {
-              weight: 0,
-              opacity: 1,
-              color: "blue",
-              fillColor: fillColor,
-              fillOpacity: 0.7,
-            };
-          
+          let fillColor =
+            m > f ? `rgba(161, 23, 154, ${d})` : `rgba(214, 184, 31, ${d})`; // important! need touch fillColor in computed for re-calculate when change fillColor
+          return {
+            weight: 0,
+            opacity: 1,
+            color: "blue",
+            fillColor: fillColor,
+            fillOpacity: 0.7,
+          };
+        },
+        onEachFeature: function onEachFeature(feature, layer) {
+          // does this feature have a property named popupContent?
+          if (feature.properties.in_port) {
+            layer.bindPopup("Id is " + feature.properties.id);
+          } else {
+            layer.bindPopup("Not in port");
+          }
+        },
+      },
+      options2: {
+        style: function (feature) {
+          let colors = [
+            "#9ecae1",
+            "#6baed6",
+            "#4292c6",
+            "#2171b5",
+            "#08519c",
+            "#08306b",
+          ];
+          let d = feature.properties.student_count;
+          let m =
+            d > 200
+              ? colors[5]
+              : d > 100
+              ? colors[4]
+              : d > 50
+              ? colors[3]
+              : d > 20
+              ? colors[2]
+              : d > 10
+              ? colors[1]
+              : colors[0];
+          let fillColor = m;
+          return {
+            weight: 0,
+            opacity: 1,
+            color: "blue",
+            fillColor: fillColor,
+            fillOpacity: 0.7,
+          };
         },
         onEachFeature: function onEachFeature(feature, layer) {
           // does this feature have a property named popupContent?
@@ -5454,62 +5495,37 @@ export default {
         },
       },
     };
-    // styleFunction() {
-    //   const fillColor = this.fillColor; // important! need touch fillColor in computed for re-calculate when change fillColor
-    //   return () => {
-    //     return {
-    //       weight: 2,
-    //       color: "#ECEFF1",
-    //       opacity: 1,
-    //       fillColor: fillColor,
-    //       fillOpacity: 1,
-    //     };
-    //   };
-    // },
-    // getColor(m, f) {
-    //   let d = m > f ? m / (m + f) : f / (m + f);
-    //   return m > f ? `rgba(161, 23, 154, ${d})` : `rgba(214, 184, 31, ${d})`;
-    // },
-    // styleFunction(feature) {
-    //   // debugger;
-    //   const fillColor = this.getColor(
-    //     feature.properties.male_student_count,
-    //     feature.properties.female_student_count
-    //   ); // important! need touch fillColor in computed for re-calculate when change fillColor
-    //   return () => {
-    //     return {
-    //       weight: 0,
-    //       opacity: 1,
-    //       color: "blue",
-    //       fillColor: fillColor,
-    //       fillOpacity: 0.7,
-    //     };
-    //   };
-    // },
-    // style() {
-    //   return {
-    //     fillColor: this.getColor(
-    //       this.geojson.feature.properties.male_student_count,
-    //       this.geojson.feature.properties.female_student_count
-    //     ),
-    //     weight: 0,
-    //     opacity: 1,
-    //     color: "blue",
-    //     fillOpacity: 0.7,
-    //   };
-    // },
-    // onEachFeature: function onEachFeature(feature, layer) {
-    //   // does this feature have a property named popupContent?
-    //   if (feature.properties.in_port) {
-    //     layer.bindPopup("Id is " + feature.properties.id);
-    //   } else {
-    //     layer.bindPopup("Not in port");
-    //   }
   },
   methods: {
-    getColor(m, f) {
-      let d = m > f ? m / (m + f) : f / (m + f);
-      return m > f ? `rgba(161, 23, 154, ${d})` : `rgba(214, 184, 31, ${d})`;
+    async downloadCSV() {
+      this.isLoading = true;
+      try {
+        axios({
+          url: "http://visualminer.com/api/download-csv",
+          method: "GET",
+          responseType: "blob",
+          headers: {'Content-Type': 'multipart/form-data'}
+        }).then((response) => {
+          var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          var fileLink = document.createElement("a");
+
+          fileLink.href = fileURL;
+          fileLink.setAttribute("download", "file.csv");
+          document.body.appendChild(fileLink);
+
+          fileLink.click();
+        });
+
+        // let res = await axios.post("http://visualminer.com/api/download-csv", {
+        //   ...this.model,
+        // });
+        // this.isLoading = false;
+        // Vue.$toast.success(res.data.message.en);
+        // this.navigate(res.data.result);
+      } catch (e) {
+        this.isLoading = false;
+        Vue.$toast.error("Something unexpected happend!");
+      }
     },
   },
 };

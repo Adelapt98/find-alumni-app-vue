@@ -67,7 +67,7 @@ export default {
     async submitUserDetails() {
       this.isLoading = true;
       try {
-        let res = await axios.post("http://localhost:2000/api/scholar-find", {
+        let res = await axios.post("http://visualminer.com/api/scholar-find", {
           ...this.model,
         });
         this.isLoading = false;

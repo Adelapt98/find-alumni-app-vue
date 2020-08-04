@@ -17,7 +17,7 @@ Vue.mixin({
   data: function() {
     return {
       get serverAddress() {
-        return "https://localhost:2000/api/";
+        return "https://visualminer.com/api/";
       }
     }
   }

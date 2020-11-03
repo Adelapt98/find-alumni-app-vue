@@ -1,5 +1,7 @@
 # find-alumni-app
 
+this is the interface of [find-alumni](https://github.com/Adelapt98/find-alumni) project and implemented by vue.js.
+
 ## Project setup
 ```
 npm install
